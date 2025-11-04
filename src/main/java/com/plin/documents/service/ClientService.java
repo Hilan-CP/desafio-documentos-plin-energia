@@ -3,7 +3,7 @@ package com.plin.documents.service;
 import com.plin.documents.dto.ClientCreateDTO;
 import com.plin.documents.dto.ClientDTO;
 import com.plin.documents.entity.Client;
-import com.plin.documents.exceptions.ResourceNotFoundException;
+import com.plin.documents.exception.ResourceNotFoundException;
 import com.plin.documents.mapper.ClientMapper;
 import com.plin.documents.repository.ClientRepository;
 import com.plin.documents.repository.DocumentRepository;

@@ -1,4 +1,4 @@
-package com.plin.documents.exceptions;
+package com.plin.documents.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {
