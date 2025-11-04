@@ -7,7 +7,6 @@ import com.plin.documents.entity.Client;
 import com.plin.documents.exception.ResourceNotFoundException;
 import com.plin.documents.mapper.ClientMapper;
 import com.plin.documents.repository.ClientRepository;
-import com.plin.documents.repository.DocumentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,11 +16,9 @@ import java.util.List;
 @Service
 public class ClientService {
     private final ClientRepository clientRepository;
-    private final DocumentRepository documentRepository;
 
-    public ClientService(ClientRepository clientRepository, DocumentRepository documentRepository) {
+    public ClientService(ClientRepository clientRepository) {
         this.clientRepository = clientRepository;
-        this.documentRepository = documentRepository;
     }
 
     @Transactional(readOnly = true)
