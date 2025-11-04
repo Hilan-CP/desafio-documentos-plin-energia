@@ -19,7 +19,7 @@ public class Client {
     private String email;
     private LocalDate creationDate;
 
-    @OneToMany(mappedBy = "client")
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     List<Document> documents = new ArrayList<>();
 
     public Client() {
