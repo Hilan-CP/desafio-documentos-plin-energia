@@ -9,8 +9,7 @@ public class DocumentMapper {
         return new DocumentDTO(
                 entity.getId(),
                 entity.getTitle(),
-                entity.getCreationDate(),
-                entity.getClient().getId()
+                entity.getCreationDate()
         );
     }
 }

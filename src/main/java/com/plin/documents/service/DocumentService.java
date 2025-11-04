@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class DocumentService {
@@ -63,5 +64,13 @@ public class DocumentService {
                 document.getTitle(),
                 new ByteArrayResource(document.getContent()));
         return documentContent;
+    }
+
+    @Transactional(readOnly = true)
+    public List<DocumentDTO> getDocumentsByClientId(Long clientId) {
+        List<Document> documents = documentRepository.findByClientId(clientId);
+        return documents.stream()
+                .map(document -> DocumentMapper.toDto(document))
+                .toList();
     }
 }

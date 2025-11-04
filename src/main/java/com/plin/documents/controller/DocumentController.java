@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/documents")
@@ -20,6 +21,12 @@ public class DocumentController {
 
     public DocumentController(DocumentService service) {
         this.service = service;
+    }
+
+    @GetMapping("/client/{clientId}")
+    public ResponseEntity<List<DocumentDTO>> getDocumentsByClientId(@PathVariable Long clientId){
+        List<DocumentDTO> documents = service.getDocumentsByClientId(clientId);
+        return ResponseEntity.ok(documents);
     }
 
     @GetMapping("/download/{id}")

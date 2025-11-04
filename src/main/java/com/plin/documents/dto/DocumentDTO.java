@@ -6,16 +6,14 @@ public class DocumentDTO {
     private Long id;
     private String title;
     private LocalDate creationDate;
-    private Long clientId;
 
     public DocumentDTO() {
     }
 
-    public DocumentDTO(Long id, String title, LocalDate creationDate, Long clientId) {
+    public DocumentDTO(Long id, String title, LocalDate creationDate) {
         this.id = id;
         this.title = title;
         this.creationDate = creationDate;
-        this.clientId = clientId;
     }
 
     public Long getId() {
@@ -40,13 +38,5 @@ public class DocumentDTO {
 
     public void setCreationDate(LocalDate creationDate) {
         this.creationDate = creationDate;
-    }
-
-    public Long getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(Long clientId) {
-        this.clientId = clientId;
     }
 }
