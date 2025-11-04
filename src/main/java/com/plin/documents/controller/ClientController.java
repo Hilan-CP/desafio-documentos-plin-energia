@@ -2,6 +2,7 @@ package com.plin.documents.controller;
 
 import com.plin.documents.dto.ClientCreateDTO;
 import com.plin.documents.dto.ClientDTO;
+import com.plin.documents.dto.ClientWithDocumentsDTO;
 import com.plin.documents.service.ClientService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,12 @@ public class ClientController {
 
     public ClientController(ClientService service) {
         this.service = service;
+    }
+
+    @GetMapping("/{id}/documents")
+    public ResponseEntity<ClientWithDocumentsDTO> getClientDocuments(@PathVariable Long id){
+        ClientWithDocumentsDTO clientWithDocuments = service.getClientDocuments(id);
+        return ResponseEntity.ok(clientWithDocuments);
     }
 
     @GetMapping

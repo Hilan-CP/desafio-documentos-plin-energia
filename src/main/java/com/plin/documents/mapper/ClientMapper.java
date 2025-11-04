@@ -2,7 +2,11 @@ package com.plin.documents.mapper;
 
 import com.plin.documents.dto.ClientCreateDTO;
 import com.plin.documents.dto.ClientDTO;
+import com.plin.documents.dto.ClientWithDocumentsDTO;
+import com.plin.documents.dto.DocumentDTO;
 import com.plin.documents.entity.Client;
+
+import java.util.List;
 
 public class ClientMapper {
     public static Client toEntity(ClientCreateDTO dto, Client entity){
@@ -11,12 +15,26 @@ public class ClientMapper {
         return entity;
     }
 
-    public static ClientDTO toDto(Client entity){
+    public static ClientDTO toClientDto(Client entity){
         return new ClientDTO(
                 entity.getId(),
                 entity.getName(),
                 entity.getEmail(),
                 entity.getCreationDate(),
-                (long) entity.getDocuments().size());
+                null);
+    }
+
+    public static ClientWithDocumentsDTO toClientWithDocumentsDto(Client entity){
+        ClientWithDocumentsDTO dto = new ClientWithDocumentsDTO(
+                entity.getId(),
+                entity.getName(),
+                entity.getEmail(),
+                entity.getCreationDate()
+        );
+        List<DocumentDTO> documentDtoList = entity.getDocuments().stream()
+                .map(document -> DocumentMapper.toDto(document))
+                .toList();
+        dto.getDocuments().addAll(documentDtoList);
+        return dto;
     }
 }
