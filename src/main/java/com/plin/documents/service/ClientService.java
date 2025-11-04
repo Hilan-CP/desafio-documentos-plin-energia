@@ -25,10 +25,8 @@ public class ClientService {
 
     @Transactional(readOnly = true)
     public List<ClientDTO> getAllClients(){
-        List<Client> clients = clientRepository.findAll();
-        return clients.stream()
-                .map(client -> ClientMapper.toDto(client))
-                .toList();
+        List<ClientDTO> clients = clientRepository.findAllClients();
+        return clients;
     }
 
     @Transactional

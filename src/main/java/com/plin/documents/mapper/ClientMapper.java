@@ -17,6 +17,6 @@ public class ClientMapper {
                 entity.getName(),
                 entity.getEmail(),
                 entity.getCreationDate(),
-                entity.getDocuments().size());
+                (long) entity.getDocuments().size());
     }
 }

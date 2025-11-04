@@ -7,12 +7,12 @@ public class ClientDTO {
     private String name;
     private String email;
     private LocalDate creationDate;
-    private Integer documentAmount;
+    private Long documentAmount;
 
     public ClientDTO() {
     }
 
-    public ClientDTO(Long id, String name, String email, LocalDate creationDate, Integer documentAmount) {
+    public ClientDTO(Long id, String name, String email, LocalDate creationDate, Long documentAmount) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -52,11 +52,11 @@ public class ClientDTO {
         this.creationDate = creationDate;
     }
 
-    public Integer getDocumentAmount() {
+    public Long getDocumentAmount() {
         return documentAmount;
     }
 
-    public void setDocumentAmount(Integer documentAmount) {
+    public void setDocumentAmount(Long documentAmount) {
         this.documentAmount = documentAmount;
     }
 }
