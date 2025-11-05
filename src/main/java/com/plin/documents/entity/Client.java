@@ -16,7 +16,10 @@ public class Client {
     private Long id;
 
     private String name;
+
+    @Column(unique = true)
     private String email;
+
     private LocalDate creationDate;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)

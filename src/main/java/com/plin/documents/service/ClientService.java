@@ -5,8 +5,10 @@ import com.plin.documents.dto.ClientDTO;
 import com.plin.documents.dto.ClientWithDocumentsDTO;
 import com.plin.documents.entity.Client;
 import com.plin.documents.exception.ResourceNotFoundException;
+import com.plin.documents.exception.UniqueFieldException;
 import com.plin.documents.mapper.ClientMapper;
 import com.plin.documents.repository.ClientRepository;
+import com.plin.documents.validation.ClientValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +18,11 @@ import java.util.List;
 @Service
 public class ClientService {
     private final ClientRepository clientRepository;
+    private final ClientValidator validator;
 
-    public ClientService(ClientRepository clientRepository) {
+    public ClientService(ClientRepository clientRepository, ClientValidator validator) {
         this.clientRepository = clientRepository;
+        this.validator = validator;
     }
 
     @Transactional(readOnly = true)
@@ -36,6 +40,10 @@ public class ClientService {
 
     @Transactional
     public ClientDTO createClient(ClientCreateDTO dto){
+        validator.validate(dto);
+        if(clientRepository.existsByEmailAndNotId(dto.getEmail(), 0L)){
+            throw new UniqueFieldException("Email já cadastrado para outro cliente");
+        }
         Client entity = new Client();
         entity = ClientMapper.toEntity(dto, entity);
         entity.setCreationDate(LocalDate.now());
@@ -45,6 +53,10 @@ public class ClientService {
 
     @Transactional
     public ClientDTO updateClient(Long id, ClientCreateDTO dto){
+        validator.validate(dto);
+        if(clientRepository.existsByEmailAndNotId(dto.getEmail(), id)){
+            throw new UniqueFieldException("Email já cadastrado para outro cliente");
+        }
         Client entity = clientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
         entity = ClientMapper.toEntity(dto, entity);

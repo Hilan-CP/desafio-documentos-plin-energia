@@ -3,6 +3,8 @@ package com.plin.documents.controller.handler;
 import com.plin.documents.dto.error.CustomError;
 import com.plin.documents.exception.DocumentException;
 import com.plin.documents.exception.ResourceNotFoundException;
+import com.plin.documents.exception.UniqueFieldException;
+import com.plin.documents.exception.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,20 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(DocumentException.class)
     public ResponseEntity<CustomError> handleDocumentException(DocumentException exception, HttpServletRequest request){
         HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+        CustomError error = new CustomError(Instant.now(), status.value(), exception.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(error);
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<CustomError> handleValidationException(ValidationException exception, HttpServletRequest request){
+        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+        CustomError error = new CustomError(Instant.now(), status.value(), exception.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(error);
+    }
+
+    @ExceptionHandler(UniqueFieldException.class)
+    public ResponseEntity<CustomError> handleUniqueFieldException(UniqueFieldException exception, HttpServletRequest request){
+        HttpStatus status = HttpStatus.CONFLICT;
         CustomError error = new CustomError(Instant.now(), status.value(), exception.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(error);
     }

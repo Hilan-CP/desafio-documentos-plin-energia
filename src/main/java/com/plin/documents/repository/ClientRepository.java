@@ -23,4 +23,13 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
             ORDER BY client.id
             """)
     List<ClientDTO> findAllClients();
+
+    // consulta JPQL para verificar se um email já está cadastrado para outro cliente
+    @Query("""
+            SELECT COUNT(client) >= 1
+            FROM Client client
+            WHERE client.email = :email
+                AND client.id <> :id
+            """)
+    boolean existsByEmailAndNotId(String email, Long id);
 }

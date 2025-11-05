@@ -6,7 +6,9 @@ import com.plin.documents.dto.ClientWithDocumentsDTO;
 import com.plin.documents.entity.Client;
 import com.plin.documents.entity.Document;
 import com.plin.documents.exception.ResourceNotFoundException;
+import com.plin.documents.exception.UniqueFieldException;
 import com.plin.documents.repository.ClientRepository;
+import com.plin.documents.validation.ClientValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,9 @@ public class ClientServiceTests {
 
     @Mock
     private ClientRepository clientRepository;
+
+    @Mock
+    private ClientValidator validator;
 
     private Long existingId;
     private Long nonExistingId;
@@ -56,6 +61,9 @@ public class ClientServiceTests {
         Mockito.when(clientRepository.save(any())).thenReturn(savedClient);
         Mockito.when(clientRepository.existsById(existingId)).thenReturn(true);
         Mockito.when(clientRepository.existsById(nonExistingId)).thenReturn(false);
+        Mockito.when(clientRepository.existsByEmailAndNotId(client.getEmail(), 0L)).thenReturn(true);
+        Mockito.when(clientRepository.existsByEmailAndNotId(client.getEmail(), savedClient.getId())).thenReturn(false);
+        Mockito.doNothing().when(validator).validate(any());
     }
 
     @Test
@@ -80,12 +88,18 @@ public class ClientServiceTests {
     }
 
     @Test
-    public void createClientShouldReturnClientDTO() {
+    public void createClientShouldReturnClientDTOWhenUniqueEmail() {
         ClientDTO newClient = service.createClient(clientCreateDto);
         Assertions.assertNotNull(newClient.getId());
         Assertions.assertEquals(clientCreateDto.getName(), newClient.getName());
         Assertions.assertEquals(clientCreateDto.getEmail(), newClient.getEmail());
         Assertions.assertNotNull(newClient.getCreationDate());
+    }
+
+    @Test
+    public void createClientShouldThrowUniqueFieldExceptionWhenDuplicateEmail() {
+        clientCreateDto.setEmail(client.getEmail());
+        Assertions.assertThrows(UniqueFieldException.class, () -> service.createClient(clientCreateDto));
     }
 
     @Test
@@ -100,6 +114,12 @@ public class ClientServiceTests {
     @Test
     public void updateClientShouldThrowResourceNotFoundExceptionWhenNonExistingId() {
         Assertions.assertThrows(ResourceNotFoundException.class, () -> service.updateClient(nonExistingId, clientCreateDto));
+    }
+
+    @Test
+    public void updateClientShouldThrowUniqueFieldExceptionWhenDuplicateEmail() {
+        clientCreateDto.setEmail(client.getEmail());
+        Assertions.assertThrows(UniqueFieldException.class, () -> service.createClient(clientCreateDto));
     }
 
     @Test
