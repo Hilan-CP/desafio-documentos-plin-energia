@@ -3,11 +3,13 @@ package com.plin.documents.service;
 import com.plin.documents.dto.ClientCreateDTO;
 import com.plin.documents.dto.ClientDTO;
 import com.plin.documents.dto.ClientWithDocumentsDTO;
+import com.plin.documents.dto.DocumentDTO;
 import com.plin.documents.entity.Client;
 import com.plin.documents.exception.ResourceNotFoundException;
 import com.plin.documents.exception.UniqueFieldException;
 import com.plin.documents.mapper.ClientMapper;
 import com.plin.documents.repository.ClientRepository;
+import com.plin.documents.repository.DocumentRepository;
 import com.plin.documents.validation.ClientValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,10 +20,12 @@ import java.util.List;
 @Service
 public class ClientService {
     private final ClientRepository clientRepository;
+    private final DocumentRepository documentRepository;
     private final ClientValidator validator;
 
-    public ClientService(ClientRepository clientRepository, ClientValidator validator) {
+    public ClientService(ClientRepository clientRepository, DocumentRepository documentRepository, ClientValidator validator) {
         this.clientRepository = clientRepository;
+        this.documentRepository = documentRepository;
         this.validator = validator;
     }
 
@@ -29,7 +33,8 @@ public class ClientService {
     public ClientWithDocumentsDTO getClientDocuments(Long id) {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
-        return ClientMapper.toClientWithDocumentsDto(client);
+        List<DocumentDTO> documentDtoList = documentRepository.findAllByClientId(id);
+        return ClientMapper.toClientWithDocumentsDto(client, documentDtoList);
     }
 
     @Transactional(readOnly = true)

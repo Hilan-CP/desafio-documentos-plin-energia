@@ -24,16 +24,13 @@ public class ClientMapper {
                 null);
     }
 
-    public static ClientWithDocumentsDTO toClientWithDocumentsDto(Client entity){
+    public static ClientWithDocumentsDTO toClientWithDocumentsDto(Client entity, List<DocumentDTO> documentDtoList){
         ClientWithDocumentsDTO dto = new ClientWithDocumentsDTO(
                 entity.getId(),
                 entity.getName(),
                 entity.getEmail(),
                 entity.getCreationDate()
         );
-        List<DocumentDTO> documentDtoList = entity.getDocuments().stream()
-                .map(document -> DocumentMapper.toDto(document))
-                .toList();
         dto.getDocuments().addAll(documentDtoList);
         return dto;
     }

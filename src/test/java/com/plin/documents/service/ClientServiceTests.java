@@ -3,11 +3,13 @@ package com.plin.documents.service;
 import com.plin.documents.dto.ClientCreateDTO;
 import com.plin.documents.dto.ClientDTO;
 import com.plin.documents.dto.ClientWithDocumentsDTO;
+import com.plin.documents.dto.DocumentDTO;
 import com.plin.documents.entity.Client;
 import com.plin.documents.entity.Document;
 import com.plin.documents.exception.ResourceNotFoundException;
 import com.plin.documents.exception.UniqueFieldException;
 import com.plin.documents.repository.ClientRepository;
+import com.plin.documents.repository.DocumentRepository;
 import com.plin.documents.validation.ClientValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +36,9 @@ public class ClientServiceTests {
     private ClientRepository clientRepository;
 
     @Mock
+    private DocumentRepository documentRepository;
+
+    @Mock
     private ClientValidator validator;
 
     private Long existingId;
@@ -43,6 +48,7 @@ public class ClientServiceTests {
     private ClientDTO clientDto;
     private ClientCreateDTO clientCreateDto;
     private Document document;
+    private DocumentDTO documentDto;
 
     // inicializa as variáveis e configura os mocks antes de cada teste
     @BeforeEach
@@ -55,6 +61,7 @@ public class ClientServiceTests {
         savedClient = new Client(2L, clientCreateDto.getName(), clientCreateDto.getEmail(), LocalDate.now());
         document = new Document(1L, "Doc Teste", "conteudo exemplo".getBytes(), LocalDate.now(), client);
         client.getDocuments().add(document);
+        documentDto = new DocumentDTO(document.getId(), document.getTitle(), document.getCreationDate());
         Mockito.when(clientRepository.findById(existingId)).thenReturn(Optional.of(client));
         Mockito.when(clientRepository.findById(nonExistingId)).thenReturn(Optional.empty());
         Mockito.when(clientRepository.findAllClients()).thenReturn(List.of(clientDto));
@@ -64,6 +71,7 @@ public class ClientServiceTests {
         Mockito.when(clientRepository.existsByEmailAndNotId(client.getEmail(), 0L)).thenReturn(true);
         Mockito.when(clientRepository.existsByEmailAndNotId(client.getEmail(), savedClient.getId())).thenReturn(false);
         Mockito.doNothing().when(validator).validate(any());
+        Mockito.when(documentRepository.findAllByClientId(existingId)).thenReturn(List.of(documentDto));
     }
 
     @Test

@@ -68,9 +68,6 @@ public class DocumentService {
 
     @Transactional(readOnly = true)
     public List<DocumentDTO> getDocumentsByClientId(Long clientId) {
-        List<Document> documents = documentRepository.findByClientId(clientId);
-        return documents.stream()
-                .map(document -> DocumentMapper.toDto(document))
-                .toList();
+        return documentRepository.findAllByClientId(clientId);
     }
 }
