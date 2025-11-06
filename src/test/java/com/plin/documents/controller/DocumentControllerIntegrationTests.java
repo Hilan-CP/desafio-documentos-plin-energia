@@ -1,6 +1,7 @@
 package com.plin.documents.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.plin.documents.dto.DocumentUrl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -30,12 +30,14 @@ public class DocumentControllerIntegrationTests {
     private Long existingId;
     private Long nonExistingId;
     private MockMultipartFile file;
+    private DocumentUrl documentUrl;
 
     @BeforeEach
     void setUp(){
         existingId = 1L;
         nonExistingId = 1000L;
         file = new MockMultipartFile("file", "arquivo.pdf", "application/pdf", "conteudo falso".getBytes());
+        documentUrl = new DocumentUrl("https://www.google.com.br");
     }
 
     @Test
@@ -83,6 +85,26 @@ public class DocumentControllerIntegrationTests {
         mockMvc.perform(multipart(HttpMethod.POST, "/documents/upload")
                         .file(file)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .header("X-Client-Id", nonExistingId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void createDocumentFromUrlShouldReturnOKWhenExistingClientId() throws Exception {
+        String json = objectMapper.writeValueAsString(documentUrl);
+        mockMvc.perform(post("/documents/url")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .header("X-Client-Id", existingId))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void createDocumentFromUrlShouldReturnNotFoundWhenNonExistingClientId() throws Exception {
+        String json = objectMapper.writeValueAsString(documentUrl);
+        mockMvc.perform(post("/documents/url")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
                         .header("X-Client-Id", nonExistingId))
                 .andExpect(status().isNotFound());
     }

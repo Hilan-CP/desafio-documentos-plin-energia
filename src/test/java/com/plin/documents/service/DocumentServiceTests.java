@@ -2,6 +2,7 @@ package com.plin.documents.service;
 
 import com.plin.documents.dto.DocumentContentDTO;
 import com.plin.documents.dto.DocumentDTO;
+import com.plin.documents.dto.DocumentUrl;
 import com.plin.documents.entity.Client;
 import com.plin.documents.entity.Document;
 import com.plin.documents.exception.DocumentException;
@@ -41,12 +42,16 @@ public class DocumentServiceTests {
     @Mock
     private MultipartFile file;
 
+    @Mock
+    private DocumentExtractorService extractorService;
+
     private Long existingId;
     private Long nonExistingId;
     private Document document;
     private DocumentDTO documentDto;
     private DocumentContentDTO documentContentDto;
     private Client client;
+    private DocumentUrl documentUrl;
 
     @BeforeEach
     void setUp(){
@@ -56,6 +61,7 @@ public class DocumentServiceTests {
         document = new Document(existingId, "Título", "conteudo teste".getBytes(), LocalDate.now(), client);
         documentDto = new DocumentDTO(document.getId(), document.getTitle(), document.getCreationDate());
         documentContentDto = new DocumentContentDTO(document.getTitle(), new ByteArrayResource(document.getContent()));
+        documentUrl = new DocumentUrl("https://www.google.com.br");
         Mockito.when(documentRepository.save(any())).thenReturn(document);
         Mockito.when(documentRepository.findById(existingId)).thenReturn(Optional.of(document));
         Mockito.when(documentRepository.findById(nonExistingId)).thenReturn(Optional.empty());
@@ -63,6 +69,7 @@ public class DocumentServiceTests {
         Mockito.when(clientRepository.findById(existingId)).thenReturn(Optional.of(client));
         Mockito.when(clientRepository.findById(nonExistingId)).thenReturn(Optional.empty());
         Mockito.when(file.getOriginalFilename()).thenReturn(document.getTitle());
+        Mockito.when(extractorService.savePageAsPdf(any())).thenReturn(document);
     }
 
     @Test
@@ -102,5 +109,18 @@ public class DocumentServiceTests {
     public void createDocumentFromUploadShouldThrowDocumentExceptionWhenDocumentReadException() throws IOException {
         Mockito.when(file.getBytes()).thenThrow(IOException.class);
         Assertions.assertThrows(DocumentException.class, () -> service.createDocumentFromUpload(existingId, file));
+    }
+
+    @Test
+    public void createDocumentFromUrlShouldReturnDocumentDTOWhenExistingClient() throws IOException {
+        DocumentDTO documentDTO = service.createDocumentFromUrl(existingId, documentUrl);
+        Assertions.assertEquals(document.getId(), documentDTO.getId());
+        Assertions.assertEquals(document.getTitle(), documentDTO.getTitle());
+        Assertions.assertEquals(document.getCreationDate(), documentDTO.getCreationDate());
+    }
+
+    @Test
+    public void createDocumentFromUrlShouldThrowResourceNotFoundExceptionWhenNonExistingClient() throws IOException {
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> service.createDocumentFromUrl(nonExistingId, documentUrl));
     }
 }

@@ -23,10 +23,12 @@ import java.util.List;
 public class DocumentService {
     private final DocumentRepository documentRepository;
     private final ClientRepository clientRepository;
+    private final DocumentExtractorService extractorService;
 
-    public DocumentService(DocumentRepository documentRepository, ClientRepository clientRepository) {
+    public DocumentService(DocumentRepository documentRepository, ClientRepository clientRepository, DocumentExtractorService extractorService) {
         this.documentRepository = documentRepository;
         this.clientRepository = clientRepository;
+        this.extractorService = extractorService;
     }
 
     public DocumentDTO createDocumentFromUpload(Long clientId, MultipartFile file) {
@@ -40,7 +42,8 @@ public class DocumentService {
     }
 
     public DocumentDTO createDocumentFromUrl(Long clientId, DocumentUrl url){
-        throw new UnsupportedOperationException("Não implementado");
+        Document document = extractorService.savePageAsPdf(url.getUrl());
+        return createDocument(clientId, document.getTitle(), document.getContent());
     }
 
     @Transactional
