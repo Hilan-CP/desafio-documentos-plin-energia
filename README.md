@@ -18,14 +18,14 @@ docker-compose up -d
 ```
 
 ### Execução Local
-Executa banco de dados e selenium em containers Docker e a aplicação localmente (necessário para executar testes com o Selenium)
+Executa banco de dados e selenium em containers Docker e a aplicação localmente
 
 ```
 # sobe o selenium
-docker-compose up -d selenium_browser
+docker-compose up -d selenium-browser
 
 # sobe o banco de dados
-docker-compose up -d plin_database
+docker-compose up -d plin-database
 
 # sobe a aplicação
 ./mvnw.cmd spring-boot:run
@@ -35,15 +35,16 @@ docker-compose up -d plin_database
 Executa testes unitários e de integração localmente
 
 ```
-docker-compose up -d selenium_browser
-docker-compose up -d plin_database
+docker-compose up -d selenium-browser
+docker-compose up -d plin-database
 ./mvnw.cmd package
 ```
 
 Resultado de cobertura de testes pode ser encontrado na pasta do projeto em `/target/jacoco-report/index.html`
 
 ### Limitações
-Por dificuldades de integração entre a aplicação e o Selenium em containers Docker, a funcionalidade que envolve web scraping só pode ser executada localmente.
+- A extração de documentos via URL não está preparada para lidar com captcha da CloudFlare
+- A extração de documentos via URL não lida com login ou com arquivos compartilhados em nuvem (Google Drive, OneDrive, etc...)
 
 Endpoint: `/documents/url`
 
@@ -114,7 +115,7 @@ Enviar um request body do tipo form-data
 `file: [arquivo.pdf]`
 
 -----
-- Criar documento a partir de URL (somente execução local)
+- Criar documento a partir de URL
 
 Caminho: /documents/url
 

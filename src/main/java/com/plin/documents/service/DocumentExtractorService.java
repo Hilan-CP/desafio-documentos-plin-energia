@@ -1,50 +1,47 @@
 package com.plin.documents.service;
 
 import com.plin.documents.entity.Document;
-import org.openqa.selenium.chrome.ChromeDriver;
+import com.plin.documents.exception.DocumentException;
+import org.openqa.selenium.Pdf;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.devtools.DevTools;
-import org.openqa.selenium.devtools.v142.page.Page;
+import org.openqa.selenium.print.PrintOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.Base64;
-import java.util.Optional;
 
 @Service
 public class DocumentExtractorService {
-    public Document savePageAsPdf(String url){
+
+    @Value("${selenium.grid}")
+    private String seleniumGridUrl;
+
+    public Document savePageAsPdf(String url) {
+        URL seleniumUrl = buildSeleniumGridUrl();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");
-        ChromeDriver driver = new ChromeDriver(options);
-        DevTools devTools = driver.getDevTools();
-        devTools.createSession();
+        RemoteWebDriver driver = new RemoteWebDriver(seleniumUrl, options);
         driver.get(url);
         String title = driver.getTitle() + ".pdf";
-        byte[] content = printToPdf(devTools);
+        byte[] content = printToPdf(driver);
         driver.quit();
         return new Document(null, title, content, null, null);
     }
 
-    private byte[] printToPdf(DevTools devTools){
-        Page.PrintToPDFResponse pdfResponse = devTools.send(Page.printToPDF(
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty()
-        ));
-        return Base64.getDecoder().decode(pdfResponse.getData());
+    private URL buildSeleniumGridUrl(){
+        try {
+            return URI.create(seleniumGridUrl).toURL();
+        } catch (MalformedURLException e) {
+            throw new DocumentException("URL mal formada para Selenium Grid", e);
+        }
+    }
+
+    private byte[] printToPdf(RemoteWebDriver driver){
+        Pdf pdf = driver.print(new PrintOptions());
+        return Base64.getDecoder().decode(pdf.getContent());
     }
 }

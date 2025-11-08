@@ -1,7 +1,7 @@
 services:
-  plin_database:
+  plin-database:
     image: postgres
-    container_name: plin_database
+    container_name: plin-database
     ports:
       - "5432:5432"
     environment:
@@ -17,21 +17,21 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DB_URL=jdbc:postgresql://plin_database:5432/plin_clients
+      - DB_URL=jdbc:postgresql://plin-database:5432/plin_clients
       - DB_USER=plin
       - DB_PASSWORD=123456
+      - SELENIUM_GRID=http://selenium-browser:4444
     depends_on:
-      - plin_database
-      - selenium_browser
+      - plin-database
+      - selenium-browser
     networks:
       - development
 
-  selenium_browser:
+  selenium-browser:
     image: selenium/standalone-chrome
-    container_name: selenium_browser
+    container_name: selenium-browser
     ports:
-      - "4444:4444"
-      - "7900:7900"
+      - "4442-4444:4442-4444"
     networks:
       - development
 
